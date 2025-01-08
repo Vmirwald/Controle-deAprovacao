@@ -117,6 +117,7 @@
                     v-if="filteredDepartments.length > 0"
                     :rows="filteredDepartments"
                     :headers="tableHeaders"
+                    :descriptionKey="'comments'"
                   />
                   <p v-else class="text-center mt-3">Nenhum departamento encontrado.</p>
                 </template>
@@ -153,24 +154,7 @@ export default {
         "Faculdade de Ciências Farmacêuticas (FCF)",
       ],
       selectedUnit: "",
-      departments: [
-        {
-          unit: "Escola de Enfermagem de Ribeirão Preto (EERP)",
-          department: "Depto Enfermagem Psiquiátrica e Ciências Humanas",
-          unanimity: "Não",
-          votesFor: 4,
-          votesAgainst: 1,
-          abstentions: 3,
-        },
-        {
-          unit: "Escola Politécnica (POLI)",
-          department: "Depto de Engenharia de Transportes",
-          unanimity: "Sim",
-          votesFor: 11,
-          votesAgainst: 0,
-          abstentions: 0,
-        },
-      ],
+      departments: [],
       filteredDepartments: [],
       tableHeaders: [
         { text: "Departamento", value: "department", align: "left" },
@@ -182,6 +166,14 @@ export default {
     };
   },
   methods: {
+    fetchData() {
+      fetch(`${import.meta.env.BASE_URL}data.json`) // Substitua com o caminho correto do JSON
+        .then((response) => response.json())
+        .then((data) => {
+          this.departments = data.departments;
+        })
+        .catch((error) => console.error("Erro ao carregar dados:", error));
+    },
     setActiveTabUnidades(tab) {
       this.activeTabUnidades = tab;
     },
@@ -190,6 +182,9 @@ export default {
         .filter((dept) => dept.unit === this.selectedUnit)
         .map(({ unit, ...rest }) => rest); // Remove a propriedade 'unit'
     },
+  },
+  mounted() {
+    this.fetchData();
   },
 };
 </script>

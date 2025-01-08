@@ -1,0 +1,70 @@
+{
+    "departments": [
+        {
+            "unit": "Escola de Enfermagem de Ribeirão Preto (EERP)",
+            "department": "Depto Enfermagem Psiquiátrica e Ciências Humanas",
+            "unanimity": "Não",
+            "votesFor": 4,
+            "votesAgainst": 1,
+            "abstentions": 3
+        },
+        {
+            "unit": "Escola de Engenharia de São Carlos (EESC)",
+            "department": "Depto de Engenharia Aeronáutica",
+            "unanimity": "Sim",
+            "votesFor": 7,
+            "votesAgainst": 0,
+            "abstentions": 0,
+            "comments": "Aprovado o mérito, não a proposta"
+        },
+        {
+            "unit": "Escola Politécnica (POLI)",
+            "department": "Depto de Engenharia de Transportes (PTR)",
+            "unanimity": "Sim",
+            "votesFor": 11,
+            "votesAgainst": 0,
+            "abstentions": 0
+        },
+        {
+            "unit": "Escola Politécnica (POLI)",
+            "department": "Depto de Engenharia Minas e de Petróleo (PMI)",
+            "unanimity": "Sim",
+            "votesFor": 10,
+            "votesAgainst": 0,
+            "abstentions": 0
+        },
+        {
+            "unit": "Escola Politécnica (POLI)",
+            "department": "Depto de Engenharia de Sistemas Eletrônicos (PSI)",
+            "unanimity": "Sim",
+            "votesFor": null,
+            "votesAgainst": null,
+            "abstentions": null
+        },
+        {
+            "unit": "Escola Politécnica (POLI)",
+            "department": "Depto de Engenharia de Computação e Sistemas Digitais (PCS)",
+            "unanimity": "Não",
+            "votesFor": 8,
+            "votesAgainst": 0,
+            "abstentions": 5,
+            "comments": "Aprovado o mérito, não a proposta"
+        },
+        {
+            "unit": "Instituto de Ciências Matemáticas e de Computação (ICMC)",
+            "department": "Depto de Matemática Aplicada e Estatística (SME)",
+            "unanimity": "Sim",
+            "votesFor": 12,
+            "votesAgainst": 0,
+            "abstentions": 0
+        },
+        {
+            "unit": "Instituto de Ciências Matemáticas e de Computação (ICMC)",
+            "department": "Depto de Matemática (SMA)",
+            "unanimity": "Não",
+            "votesFor": 12,
+            "votesAgainst": 1,
+            "abstentions": 7
+        }
+    ]
+}
