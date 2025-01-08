@@ -167,7 +167,7 @@ export default {
   },
   methods: {
     fetchData() {
-      fetch(`${import.meta.env.BASE_URL}data.json`) // Substitua com o caminho correto do JSON
+      fetch(`./data.json`) // Substitua com o caminho correto do JSON
         .then((response) => response.json())
         .then((data) => {
           this.departments = data.departments;
