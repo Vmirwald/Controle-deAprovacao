@@ -146,13 +146,7 @@ export default {
     return {
       // Abas para Unidades
       activeTabUnidades: "Aprovaram Texto",
-      // Unidades e Departamentos
-      units: [
-        "Escola de Enfermagem de Ribeirão Preto (EERP)",
-        "Escola de Engenharia de São Carlos (EESC)",
-        "Escola Politécnica (POLI)",
-        "Faculdade de Ciências Farmacêuticas (FCF)",
-      ],
+      // Unidades e Departamentos,
       selectedUnit: "",
       departments: [],
       filteredDepartments: [],
