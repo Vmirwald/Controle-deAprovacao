@@ -144,10 +144,9 @@ export default {
   },
   data() {
     return {
-      // Abas para Unidades
       activeTabUnidades: "Aprovaram Texto",
-      // Unidades e Departamentos,
       selectedUnit: "",
+      units: [], // Lista única de unidades
       departments: [],
       filteredDepartments: [],
       tableHeaders: [
@@ -160,13 +159,21 @@ export default {
     };
   },
   methods: {
-    fetchData() {
-      fetch(`./data.json`) // Substitua com o caminho correto do JSON
-        .then((response) => response.json())
-        .then((data) => {
-          this.departments = data.departments;
-        })
-        .catch((error) => console.error("Erro ao carregar dados:", error));
+    async fetchData() {
+      try {
+        const response = await fetch(`./data.json`);
+        if (!response.ok) {
+          throw new Error("Erro ao carregar o arquivo JSON");
+        }
+
+        const data = await response.json();
+        this.departments = data.departments;
+
+        // Extraindo unidades únicas
+        this.units = [...new Set(data.departments.map((dept) => dept.unit))];
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+      }
     },
     setActiveTabUnidades(tab) {
       this.activeTabUnidades = tab;
@@ -182,6 +189,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .tabs-container {
