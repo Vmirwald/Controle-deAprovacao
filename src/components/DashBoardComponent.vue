@@ -21,18 +21,68 @@
           <div class="row">
             <!-- Card Unidades -->
             <div class="col-md-6">
-              <GenericCard :title="'Unidades'" :showNewButton="false">
+              <GenericCard :title="'Panorâma Geral'" :showNewButton="false">
                 <template #content>
                   <!-- Gráfico de Unidades -->
-                  <GenericGraph
-                    :key="graphKey"
-                    :title="'Distribuição de Apoio nas Unidades'"
-                    :labels="['Aprovaram Texto', 'Apoiam Discussão']"
-                    :data="graphData"
-                    :colors="['#4caf50', '#2196f3']"
-                    :selectedLabel="activeTabUnidades"
-                    @section-clicked="setActiveTabUnidades"
-                  />
+                  <div class="row">
+                    <div class="col-md-6" >
+                      <h4>Congregação</h4>
+                    </div>
+                    <div class="col-md-6">
+                      <h4>Reunião de Departamento</h4>
+                    </div>
+                    
+                  </div>
+                  <div class="row">
+                    
+                    <div class="col-md-2 mb-3">
+                      <div class="row">
+                        {{ graphData[0] }}
+                      </div>
+                      <div class="row">
+                        {{ graphData[1] }}
+                      </div>
+                      <div class="row">
+                        {{ totalUnidades }}
+                      </div>                     
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      
+                      <GenericGraph
+                        :key="graphKey"
+                        :title="'Distribuição de Apoio nas Unidades'"
+                        :labels="['Aprovaram Texto', 'Apoiam Discussão', 'Não Aprovam ou Apoiam']"
+                        :data="graphData"
+                        :colors="['#4caf50', '#2196f3', '#FF0000']"
+                        :selectedLabel="activeTabUnidades"
+                        @section-clicked="setActiveTabUnidades"
+                      />
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                      <div class="row">
+                        
+                      </div>
+                      <div class="row">
+                        
+                      </div>
+                      <div class="row">
+                        
+                      </div>                      
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      
+                      <GenericGraph
+                        :key="graphKey"
+                        :title="'Distribuição de Apoio nas Unidades'"
+                        :labels="['Aprovaram Texto', 'Apoiam Discussão', 'Não Aprovam ou Apoiam']"
+                        :data="graphData"
+                        :colors="['#4caf50', '#2196f3', '#FF0000']"
+                        :selectedLabel="activeTabUnidades"
+                        @section-clicked="setActiveTabUnidades"
+                      />
+                    </div>
+                  </div>
 
                   <!-- CustomNavbar -->
                   <CustomNavbar
@@ -173,8 +223,10 @@ export default {
       votacoesCongregacao: [],
       aprovamTexto: [],
       apoiamDiscussao: [],
+      nemAprovamApoiam: [],
       cidades: ["São Paulo", "Ribeirão Preto", "Piracicaba", "Bauru", "Lorena", "São Sebastião", "Santos"],
       unidades: [],
+      totalUnidades: 0,
       departamentos: [],
       selectedCidade: "",
       selectedUnidade: null,
@@ -183,7 +235,7 @@ export default {
   },
   computed: {
     graphData() {
-      return [this.aprovamTexto.length, this.apoiamDiscussao.length];
+      return [this.aprovamTexto.length, this.apoiamDiscussao.length, this.nemAprovamApoiam.length];
     },
   },
   watch: {
@@ -193,6 +245,14 @@ export default {
     },
   },
   methods: {
+    async fetchTotalUnidades() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "Unidades"));
+        this.totalUnidades = querySnapshot.size; // querySnapshot.size contém o número total de documentos
+      } catch (error) {
+        console.error("Erro ao buscar total de unidades:", error);
+      }
+    },
     async fetchTemas() {
       try {
         const querySnapshot = await getDocs(collection(db, "Temas"));
@@ -276,6 +336,13 @@ export default {
           votacao.Aprovado === "Não" &&
           votacao.Apoio === "Sim"
       );
+
+      this.nemAprovamApoiam = this.votacoesCongregacao.filter(
+        (votacao) =>
+          votacao.temaID === this.selectedTema &&
+          votacao.Aprovado === "Não" &&
+          votacao.Apoio === "Não"
+      );
     },
     formatUnitDisplay(unit) {
       if (unit.Placar && unit.Placar.Favoraveis !== null) {
@@ -291,6 +358,7 @@ export default {
     },
   },
   mounted() {
+    this.fetchTotalUnidades(); // Chame o método para buscar o total de unidades
     this.fetchTemas();
     this.fetchVotacoes();
   },
