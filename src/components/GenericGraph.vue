@@ -1,6 +1,5 @@
 <template>
-    <div class="generic-graph" :style="{ width: width, height: height }">
-      <h5 class="graph-title">{{ title }}</h5>
+    <div>
       <canvas ref="chartCanvas"></canvas>
     </div>
   </template>
@@ -8,12 +7,13 @@
   <script>
   import { Chart, registerables } from "chart.js";
   
+  Chart.register(...registerables);
+  
   export default {
-    name: "GenericGraph",
     props: {
       title: {
         type: String,
-        default: "Gráfico",
+        default: "",
       },
       labels: {
         type: Array,
@@ -25,7 +25,7 @@
       },
       colors: {
         type: Array,
-        default: () => ["#4caf50", "#2196f3", "#ffeb3b", "#f44336"],
+        required: true,
       },
       width: {
         type: String,
@@ -33,67 +33,90 @@
       },
       height: {
         type: String,
-        default: "300px",
+        default: "400px",
       },
     },
+    data() {
+      return {
+        selectedIndex: null, // Index da seção selecionada
+      };
+    },
     mounted() {
-      Chart.register(...registerables);
+      this.createChart();
+    },
+    methods: {
+      createChart() {
+        const ctx = this.$refs.chartCanvas.getContext("2d");
   
-      const chart = new Chart(this.$refs.chartCanvas, {
-        type: "doughnut",
-        data: {
-          labels: this.labels,
-          datasets: [
-            {
-              data: this.data,
-              backgroundColor: this.colors,
-            },
-          ],
-        },
-        options: {
-          responsive: false,
-          plugins: {
-            legend: {
-              position: "top",
-            },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  const label = context.label || "";
-                  const value = context.raw || 0;
-                  return `${label}: ${value}`;
-                },
+        this.chart = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: this.labels,
+            datasets: [
+              {
+                data: this.data,
+                backgroundColor: this.colors,
+                hoverOffset: 15,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              tooltip: {
+                enabled: true,
               },
             },
+            onHover: (event, elements) => {
+              if (elements.length) {
+                const chartElement = elements[0];
+                const dataset = this.chart.data.datasets[chartElement.datasetIndex];
+                dataset.hoverOffset = 20;
+                this.chart.update();
+              }
+            },
+            onLeave: () => {
+              this.chart.data.datasets.forEach((dataset, index) => {
+                dataset.hoverOffset = this.selectedIndex === index ? 20 : 15; // Destaca o selecionado
+              });
+              this.chart.update();
+            },
+            onClick: (event, elements) => {
+              if (elements.length) {
+                const chartElement = elements[0];
+                const index = chartElement.index;
+  
+                // Define o índice selecionado
+                this.selectedIndex = index;
+  
+                // Atualiza os offsets para manter o selecionado expandido
+                this.chart.data.datasets.forEach((dataset, idx) => {
+                  dataset.hoverOffset = idx === this.selectedIndex ? 20 : 15;
+                });
+  
+                this.chart.update();
+  
+                // Emite o evento para o componente pai
+                const label = this.labels[index];
+                this.$emit("section-clicked", label);
+              }
+            },
           },
-          onClick: (event, elements) => {
-            if (elements.length > 0) {
-              const index = elements[0].index;
-              const label = this.labels[index];
-              this.$emit("section-clicked", label); // Emitimos o evento com o rótulo clicado
-            }
-          },
-        },
-      });
+        });
+      },
+    },
+    beforeUnmount() {
+      if (this.chart) {
+        this.chart.destroy();
+      }
     },
   };
   </script>
   
   <style scoped>
-  .generic-graph {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    box-sizing: border-box;
-  }
-  
-  .graph-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    text-align: center;
+  canvas {
+    display: block;
+    margin: 0 auto;
   }
   </style>
   

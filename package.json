@@ -10,6 +10,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
@@ -17,6 +18,7 @@
     "bootstrap": "^5.3.3",
     "bootstrap-vue": "^2.23.1",
     "chart.js": "^4.4.7",
+    "firebase": "^11.1.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },

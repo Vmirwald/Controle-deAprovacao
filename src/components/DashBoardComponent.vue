@@ -3,6 +3,21 @@
     <GenericCard :title="'Controle de Aprovação'" :showNewButton="false">
       <template #content>
         <div class="mt-4">
+          <!-- Dropdown de Temas -->
+          <div class="mb-3">
+            <label for="tema-dropdown" class="form-label">Selecione um Tema:</label>
+            <select
+              id="tema-dropdown"
+              class="form-select"
+              v-model="selectedTema"
+            >
+              <option value="" disabled>Escolha um tema</option>
+              <option v-for="(tema, index) in temas" :key="index" :value="tema.id">
+                {{ tema.Titulo }}
+              </option>
+            </select>
+          </div>
+
           <div class="row">
             <!-- Card Unidades -->
             <div class="col-md-6">
@@ -10,75 +25,46 @@
                 <template #content>
                   <!-- Gráfico de Unidades -->
                   <GenericGraph
+                    :key="graphKey"
                     :title="'Distribuição de Apoio nas Unidades'"
-                    :labels="['Aprovaram Texto', 'Apoiam Discussão', 'Não Apoiaram']"
-                    :data="[8, 4, 30]"
-                    :colors="['#4caf50', '#2196f3', '#f44336']"
-                    width="100%"
-                    height="300px"
+                    :labels="['Aprovaram Texto', 'Apoiam Discussão']"
+                    :data="graphData"
+                    :colors="['#4caf50', '#2196f3']"
+                    :selectedLabel="activeTabUnidades"
                     @section-clicked="setActiveTabUnidades"
                   />
-                  <!-- Abas Dinâmicas -->
-                  <div class="tabs-container mt-3">
-                    <ul class="nav nav-tabs">
-                      <li class="nav-item">
-                        <a
-                          class="nav-link"
-                          :class="{ active: activeTabUnidades === 'Aprovaram Texto' }"
-                          @click="setActiveTabUnidades('Aprovaram Texto')"
-                          href="#"
+
+                  <!-- CustomNavbar -->
+                  <CustomNavbar
+                    :items="navbarItems"
+                    :activeItem="activeTabUnidades"
+                    @select="setActiveTabUnidades"
+                  />
+
+                  <!-- Conteúdo das abas -->
+                  <div class="tab-content mt-3">
+                    <div v-if="activeTabUnidades === 'Aprovaram Texto'">
+                      <ul>
+                        <li
+                          v-for="(unit, index) in aprovamTexto"
+                          :key="index"
                         >
-                          Aprovaram Texto
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a
-                          class="nav-link"
-                          :class="{ active: activeTabUnidades === 'Apoiam Discussão' }"
-                          @click="setActiveTabUnidades('Apoiam Discussão')"
-                          href="#"
+                          {{ formatUnitDisplay(unit) }}
+                        </li>
+                      </ul>
+                    </div>
+                    <div v-if="activeTabUnidades === 'Apoiam Discussão'">
+                      <ul>
+                        <li
+                          v-for="(unit, index) in apoiamDiscussao"
+                          :key="index"
                         >
-                          Apoiam Discussão
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a
-                          class="nav-link"
-                          :class="{ active: activeTabUnidades === 'Não Apoiaram' }"
-                          @click="setActiveTabUnidades('Não Apoiaram')"
-                          href="#"
-                        >
-                          Não Apoiaram
-                        </a>
-                      </li>
-                    </ul>
-                    <div class="tab-content mt-3">
-                      <div
-                        v-if="activeTabUnidades === 'Aprovaram Texto'"
-                        class="tab-pane active"
-                      >
-                        <ul>
-                          <li>Museu de Arqueologia e Etnologia (MAE) (Unanimidade) (04.04.2024)</li>
-                          <li>Escola de Enfermagem (EE) (Unanimidade) (09.10.2024)</li>
-                          <li>Faculdade de Saúde Pública (FSP) (Unanimidade) (24.10.2024)</li>
-                          <li>Instituto de Biociências (IB) 23 a favor, 3 abstenções (25.10.2024)</li>
-                        </ul>
-                      </div>
-                      <div
-                        v-if="activeTabUnidades === 'Apoiam Discussão'"
-                        class="tab-pane active"
-                      >
-                        <ul>
-                          <li>Unidade A - Informações relevantes</li>
-                          <li>Unidade B - Detalhes complementares</li>
-                        </ul>
-                      </div>
-                      <div
-                        v-if="activeTabUnidades === 'Não Apoiaram'"
-                        class="tab-pane active"
-                      >
-                        <p>Não há informações disponíveis para esta categoria.</p>
-                      </div>
+                          {{ formatUnitDisplay(unit) }}
+                        </li>
+                      </ul>
+                    </div>
+                    <div v-if="activeTabUnidades === 'Não Apoiaram'">
+                      <p>Não há informações disponíveis para esta categoria.</p>
                     </div>
                   </div>
                 </template>
@@ -89,37 +75,56 @@
             <div class="col-md-6">
               <GenericCard :title="'Departamentos'" :showNewButton="false">
                 <template #content>
-                  <!-- Destaques Departamentos -->
-                  <div class="mb-4">
-                    <h5>Resumo dos Departamentos</h5>
-                    <p>28 departamentos discutiram o tema</p>
-                    <p>26 deles aprovaram a proposta (20 por unanimidade)</p>
-                  </div>
-
-                  <!-- Dropdown para Seleção de Unidades -->
-                  <div class="mb-4">
-                    <label for="unit-dropdown" class="form-label">Selecione uma Unidade:</label>
+                  <!-- Dropdown Cidade -->
+                  <div class="mb-3">
+                    <label for="cidade-dropdown" class="form-label">Selecione a Cidade:</label>
                     <select
-                      id="unit-dropdown"
+                      id="cidade-dropdown"
                       class="form-select"
-                      v-model="selectedUnit"
-                      @change="updateTableData"
+                      v-model="selectedCidade"
+                      @change="fetchUnidades"
                     >
-                      <option value="" disabled>Escolha uma unidade</option>
-                      <option v-for="(unit, index) in units" :key="index" :value="unit">
-                        {{ unit }}
+                      <option value="" disabled>Escolha uma cidade</option>
+                      <option v-for="cidade in cidades" :key="cidade" :value="cidade">
+                        {{ cidade }}
                       </option>
                     </select>
                   </div>
 
-                  <!-- GenericTable2 para Departamentos -->
-                  <GenericTable2
-                    v-if="filteredDepartments.length > 0"
-                    :rows="filteredDepartments"
-                    :headers="tableHeaders"
-                    :descriptionKey="'comments'"
-                  />
-                  <p v-else class="text-center mt-3">Nenhum departamento encontrado.</p>
+                  <!-- Dropdown Unidade -->
+                  <div class="mb-3">
+                    <label for="unidade-dropdown" class="form-label">Selecione a Unidade:</label>
+                    <select
+                      id="unidade-dropdown"
+                      class="form-select"
+                      v-model="selectedUnidade"
+                      @change="fetchDepartamentos"
+                      :disabled="!unidades.length"
+                    >
+                      <option value="" disabled>Escolha uma unidade</option>
+                      <option v-for="unidade in unidades" :key="unidade.id" :value="unidade">
+                        {{ unidade.Nome }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Dropdown Departamento -->
+                  <div class="mb-3">
+                    <label for="departamento-dropdown" class="form-label">Selecione o Departamento:</label>
+                    <select
+                      id="departamento-dropdown"
+                      class="form-select"
+                      v-model="selectedDepartamento"
+                      :disabled="!departamentos.length"
+                    >
+                      <option value="" disabled>
+                        {{ departamentos.length ? "Escolha um departamento" : "Nenhum departamento cadastrado" }}
+                      </option>
+                      <option v-for="departamento in departamentos" :key="departamento.id" :value="departamento">
+                        {{ departamento.Nome }}
+                      </option>
+                    </select>
+                  </div>
                 </template>
               </GenericCard>
             </div>
@@ -133,85 +138,168 @@
 <script>
 import GenericCard from "@/components/GenericCard.vue";
 import GenericGraph from "@/components/GenericGraph.vue";
-import GenericTable2 from "@/components/GenericTable2.vue";
+import CustomNavbar from "@/components/CustomNavbar.vue";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/service/firebase";
 
 export default {
   name: "DashBoardComponent",
   components: {
     GenericCard,
     GenericGraph,
-    GenericTable2,
+    CustomNavbar,
   },
   data() {
     return {
+      graphKey: 0,
+      
       activeTabUnidades: "Aprovaram Texto",
-      selectedUnit: "",
-      units: [], // Lista única de unidades
-      departments: [],
-      filteredDepartments: [],
-      tableHeaders: [
-        { text: "Departamento", value: "department", align: "left" },
-        { text: "Unanimidade", value: "unanimity", align: "center" },
-        { text: "Votos a Favor", value: "votesFor", align: "right" },
-        { text: "Votos Contra", value: "votesAgainst", align: "right" },
-        { text: "Abstenções", value: "abstentions", align: "center" },
+      navbarItems: [
+        {
+          id: "Aprovaram Texto",
+          label: "Aprovaram Texto",
+          icon: "fas fa-check-circle",
+          disabled: false,
+        },
+        {
+          id: "Apoiam Discussão",
+          label: "Apoiam Discussão",
+          icon: "fas fa-comments",
+          disabled: false,
+        },
       ],
+      temas: [],
+      selectedTema: "",
+      votacoesCongregacao: [],
+      aprovamTexto: [],
+      apoiamDiscussao: [],
+      cidades: ["São Paulo", "Ribeirão Preto", "Piracicaba", "Bauru", "Lorena", "São Sebastião", "Santos"],
+      unidades: [],
+      departamentos: [],
+      selectedCidade: "",
+      selectedUnidade: null,
+      selectedDepartamento: null,
     };
   },
+  computed: {
+    graphData() {
+      return [this.aprovamTexto.length, this.apoiamDiscussao.length];
+    },
+  },
+  watch: {
+    selectedTema() {
+      this.updateTemaFilter();
+      this.graphKey++; // Incrementa a chave para recriar o gráfico
+    },
+  },
   methods: {
-    async fetchData() {
+    async fetchTemas() {
       try {
-        const response = await fetch(`./data.json`);
-        if (!response.ok) {
-          throw new Error("Erro ao carregar o arquivo JSON");
-        }
-
-        const data = await response.json();
-        this.departments = data.departments;
-
-        // Extraindo unidades únicas
-        this.units = [...new Set(data.departments.map((dept) => dept.unit))];
+        const querySnapshot = await getDocs(collection(db, "Temas"));
+        this.temas = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
+        console.error("Erro ao buscar temas:", error);
+      }
+    },
+    async fetchVotacoes() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "VotacoesCongregacao"));
+        this.votacoesCongregacao = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      } catch (error) {
+        console.error("Erro ao buscar votações de congregação:", error);
+      }
+    },
+    async fetchUnidades() {
+      if (!this.selectedCidade) {
+        this.unidades = [];
+        this.departamentos = [];
+        return;
+      }
+      try {
+        const unidadesQuery = query(
+          collection(db, "Unidades"),
+          where("Campus", "==", this.selectedCidade)
+        );
+        const querySnapshot = await getDocs(unidadesQuery);
+        this.unidades = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        this.selectedUnidade = null;
+        this.departamentos = [];
+      } catch (error) {
+        console.error("Erro ao buscar unidades:", error);
+      }
+    },
+    async fetchDepartamentos() {
+      if (!this.selectedUnidade) {
+        this.departamentos = [];
+        this.selectedDepartamento = null;
+        return;
+      }
+      try {
+        const departamentosQuery = query(
+          collection(db, "Departamentos"),
+          where("UnidadeID", "==", this.selectedUnidade.id)
+        );
+        const querySnapshot = await getDocs(departamentosQuery);
+        this.departamentos = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        this.selectedDepartamento = null;
+      } catch (error) {
+        console.error("Erro ao buscar departamentos:", error);
+      }
+    },
+    updateTemaFilter() {
+      if (!this.selectedTema) {
+        this.aprovamTexto = [];
+        this.apoiamDiscussao = [];
+        return;
+      }
+
+      // Filtra as votações com base no tema selecionado
+      this.aprovamTexto = this.votacoesCongregacao.filter(
+        (votacao) => votacao.temaID === this.selectedTema && votacao.Aprovado === "Sim"
+      );
+
+      this.apoiamDiscussao = this.votacoesCongregacao.filter(
+        (votacao) =>
+          votacao.temaID === this.selectedTema &&
+          votacao.Aprovado === "Não" &&
+          votacao.Apoio === "Sim"
+      );
+    },
+    formatUnitDisplay(unit) {
+      if (unit.Placar && unit.Placar.Favoraveis !== null) {
+        return `${unit.unidadeID} - ${unit.Placar.Favoraveis} a favor, ${unit.Placar.Contrarios} contra, ${unit.Placar.Abstencoes} abstenções - ${unit.DataVotacao}`;
+      } else if (unit.Unanimidade === "Sim") {
+        return `${unit.unidadeID} (Unanimidade) - ${unit.DataVotacao}`;
+      } else {
+        return `${unit.unidadeID} - ${unit.DataVotacao}`;
       }
     },
     setActiveTabUnidades(tab) {
       this.activeTabUnidades = tab;
     },
-    updateTableData() {
-      this.filteredDepartments = this.departments
-        .filter((dept) => dept.unit === this.selectedUnit)
-        .map(({ unit, ...rest }) => rest); // Remove a propriedade 'unit'
-    },
   },
   mounted() {
-    this.fetchData();
+    this.fetchTemas();
+    this.fetchVotacoes();
   },
 };
 </script>
 
 
 <style scoped>
-.tabs-container {
+.tab-content {
   margin-top: 1rem;
-}
-
-.nav-tabs {
-  border-bottom: 1px solid #ddd;
-}
-
-.nav-link {
-  cursor: pointer;
-}
-
-.nav-link.active {
-  font-weight: bold;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-bottom-color: transparent;
-}
-
-.text-center {
-  text-align: center;
 }
 </style>
