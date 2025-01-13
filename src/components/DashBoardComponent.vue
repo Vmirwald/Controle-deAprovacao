@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid layout-view">
+  <div class="container-fluid layout-view py-3">
     <GenericCard :title="'Controle de Aprovação'" :showNewButton="false">
       <template #content>
         <div class="mt-4">
@@ -18,165 +18,97 @@
             </select>
           </div>
 
-          <div class="row">
-            <!-- Card Unidades -->
-            <div class="col-md-6">
-              <GenericCard :title="'Panorâma Geral'" :showNewButton="false">
-                <template #content>
-                  <!-- Gráfico de Unidades -->
-                  <div class="row">
-                    <div class="col-md-6" >
-                      <h4>Congregação</h4>
+          <div class="col-md-12" v-if="selectedTema">
+            <div class="row gx-3">
+              <!-- Card Unidades -->
+              <div class="col-md-6">
+                <GenericCard :title="'Unidades'" :showNewButton="false">
+                  <template #content>
+                    <div class="row text-center mb-3">
+                      <div class="col-3">
+                        <h6>Aprovados</h6>
+                        <p>{{ graphDataCongregacao[0] }}</p>
+                      </div>
+                      <div class="col-3">
+                        <h6>Apoios</h6>
+                        <p>{{ graphDataCongregacao[1] }}</p>
+                      </div>
+                      <div class="col-3">
+                        <h6>Rejeições</h6>
+                        <p>{{ graphDataCongregacao[2] }}</p>
+                      </div>
+                      <div class="col-3">
+                        <h6>Total Unidades</h6>
+                        <p>{{ totalUnidades }}</p>
+                      </div>
                     </div>
-                    <div class="col-md-6">
-                      <h4>Reunião de Departamento</h4>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <GenericGraph
+                          v-if="graphDataCongregacao.length"
+                          :key="graphKeyCongregacao"
+                          :title="'Distribuição de Apoio nas Unidades'"
+                          :labels="['Aprovaram Texto', 'Apoiam Discussão', 'Não Aprovam ou Apoiam']"
+                          :data="graphDataCongregacao.slice()"
+                          :colors="['#4caf50', '#2196f3', '#FF0000']"
+                        />
+                        <GenericTable2
+                          :headers="tableHeadersUnidades"
+                          :rows="tableRowsUnidades"
+                          :description-key="'Comentários'"
+                        />
+                      </div>
                     </div>
-                    
-                  </div>
-                  <div class="row">
-                    
-                    <div class="col-md-2 mb-3">
-                      <div class="row">
-                        {{ graphDataCongregacao[0] }}
+                  </template>
+                </GenericCard>
+              </div>
+
+              <!-- Card Departamentos -->
+              <div class="col-md-6">
+                <GenericCard :title="'Departamentos'" :showNewButton="false">
+                  <template #content>
+                    <div v-if="tableRowsDepartamentos.length">
+                      <div class="row text-center mb-3">
+                        <div class="col-3">
+                          <h6>Aprovados</h6>
+                          <p>{{ graphDataDepartamentos[0] }}</p>
+                        </div>
+                        <div class="col-3">
+                          <h6>Apoios</h6>
+                          <p>{{ graphDataDepartamentos[1] }}</p>
+                        </div>
+                        <div class="col-3">
+                          <h6>Rejeições</h6>
+                          <p>{{ graphDataDepartamentos[2] }}</p>
+                        </div>
+                        <div class="col-3">
+                          <h6>Total Departamentos</h6>
+                          <p>{{ totalDepartamentos }}</p>
+                        </div>
                       </div>
                       <div class="row">
-                        {{ graphDataCongregacao[1] }}
+                        <div class="col-md-12">
+                          <GenericGraph
+                            v-if="graphDataDepartamentos.length"
+                            :key="graphKeyDepartamentos"
+                            :title="'Distribuição de Apoio nos Departamentos'"
+                            :labels="['Aprovaram Texto', 'Apoiam Discussão', 'Não Aprovam ou Apoiam']"
+                            :data="graphDataDepartamentos.slice()"
+                            :colors="['#4caf50', '#2196f3', '#FF0000']"
+                          />
+
+                          <GenericTable2
+                            :headers="tableHeadersDepartamentos"
+                            :rows="tableRowsDepartamentos"
+                            :description-key="'Comentários'"
+                          />
+                        </div>
                       </div>
-                      <div class="row">
-                        {{ totalUnidades }}
-                      </div>                     
                     </div>
-                    <div class="col-md-4 mb-3">
-                      
-                      <GenericGraph
-                        :key="graphKeyCongregacao"
-                        :title="'Distribuição de Apoio nas Unidades'"
-                        :labels="['Aprovaram Texto', 'Apoiam Discussão', 'Não Aprovam ou Apoiam']"
-                        :data="graphDataCongregacao"
-                        :colors="['#4caf50', '#2196f3', '#FF0000']"
-                        :selectedLabel="activeTabUnidades"
-                        @section-clicked="setActiveTabUnidades"
-                      />
-                    </div>
-
-                    <div class="col-md-2 mb-3">
-                      <div class="row">
-                        {{ graphDataDepartamentos[0] }}
-                      </div>
-                      <div class="row">
-                        {{ graphDataDepartamentos[1] }}
-                      </div>
-                      <div class="row">
-                        {{ totalDepartamentos }}
-                      </div>                     
-                    </div>
-                    <div class="col-md-4 mb-3">
-                      
-                      <GenericGraph
-                        :key="graphKeyDepartamentos"
-                        :title="'Distribuição de Apoio nas Unidades'"
-                        :labels="['Aprovaram Texto', 'Apoiam Discussão', 'Não Aprovam ou Apoiam']"
-                        :data="graphDataDepartamentos"
-                        :colors="['#4caf50', '#2196f3', '#FF0000']"
-                        :selectedLabel="activeTabUnidades"
-                        @section-clicked="setActiveTabUnidades"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- CustomNavbar -->
-                  <CustomNavbar
-                    :items="navbarItems"
-                    :activeItem="activeTabUnidades"
-                    @select="setActiveTabUnidades"
-                  />
-
-                  <!-- Conteúdo das abas -->
-                  <div class="tab-content mt-3">
-                    <div v-if="activeTabUnidades === 'Aprovaram Texto'">
-                      <ul>
-                        <li
-                          v-for="(unit, index) in aprovamTexto"
-                          :key="index"
-                        >
-                          {{ formatUnitDisplay(unit) }}
-                        </li>
-                      </ul>
-                    </div>
-                    <div v-if="activeTabUnidades === 'Apoiam Discussão'">
-                      <ul>
-                        <li
-                          v-for="(unit, index) in apoiamDiscussao"
-                          :key="index"
-                        >
-                          {{ formatUnitDisplay(unit) }}
-                        </li>
-                      </ul>
-                    </div>
-                    <div v-if="activeTabUnidades === 'Não Apoiaram'">
-                      <p>Não há informações disponíveis para esta categoria.</p>
-                    </div>
-                  </div>
-                </template>
-              </GenericCard>
-            </div>
-
-            <!-- Card Departamentos -->
-            <div class="col-md-6">
-              <GenericCard :title="'Departamentos'" :showNewButton="false">
-                <template #content>
-                  <!-- Dropdown Cidade -->
-                  <div class="mb-3">
-                    <label for="cidade-dropdown" class="form-label">Selecione a Cidade:</label>
-                    <select
-                      id="cidade-dropdown"
-                      class="form-select"
-                      v-model="selectedCidade"
-                      @change="fetchUnidades"
-                    >
-                      <option value="" disabled>Escolha uma cidade</option>
-                      <option v-for="cidade in cidades" :key="cidade" :value="cidade">
-                        {{ cidade }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <!-- Dropdown Unidade -->
-                  <div class="mb-3">
-                    <label for="unidade-dropdown" class="form-label">Selecione a Unidade:</label>
-                    <select
-                      id="unidade-dropdown"
-                      class="form-select"
-                      v-model="selectedUnidade"
-                      @change="fetchDepartamentos"
-                      :disabled="!unidades.length"
-                    >
-                      <option value="" disabled>Escolha uma unidade</option>
-                      <option v-for="unidade in unidades" :key="unidade.id" :value="unidade">
-                        {{ unidade.Nome }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <!-- Dropdown Departamento -->
-                  <div class="mb-3">
-                    <label for="departamento-dropdown" class="form-label">Selecione o Departamento:</label>
-                    <select
-                      id="departamento-dropdown"
-                      class="form-select"
-                      v-model="selectedDepartamento"
-                      :disabled="!departamentos.length"
-                    >
-                      <option value="" disabled>
-                        {{ departamentos.length ? "Escolha um departamento" : "Nenhum departamento cadastrado" }}
-                      </option>
-                      <option v-for="departamento in departamentos" :key="departamento.id" :value="departamento">
-                        {{ departamento.Nome }}
-                      </option>
-                    </select>
-                  </div>
-                </template>
-              </GenericCard>
+                    <p v-else class="text-center text-muted">Nenhum dado disponível para Departamentos.</p>
+                  </template>
+                </GenericCard>
+              </div>
             </div>
           </div>
         </div>
@@ -188,7 +120,7 @@
 <script>
 import GenericCard from "@/components/GenericCard.vue";
 import GenericGraph from "@/components/GenericGraph.vue";
-import CustomNavbar from "@/components/CustomNavbar.vue";
+import GenericTable2 from "@/components/GenericTable2.vue";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/service/firebase";
 
@@ -197,50 +129,108 @@ export default {
   components: {
     GenericCard,
     GenericGraph,
-    CustomNavbar,
+    GenericTable2,
   },
   data() {
     return {
-      graphKey: 0,
       graphKeyCongregacao: 1,
       graphKeyDepartamentos: 2,
-      activeTabUnidades: "Aprovaram Texto",
-      navbarItems: [
-        { id: "Aprovaram Texto", label: "Aprovaram Texto", icon: "fas fa-check-circle", disabled: false },
-        { id: "Apoiam Discussão", label: "Apoiam Discussão", icon: "fas fa-comments", disabled: false },
-      ],
       temas: [],
       selectedTema: "",
       votacoesCongregacao: [],
       votacoesDepartamentos: [],
       graphDataCongregacao: [0, 0, 0],
-      graphDataDepartamentos: [0, 0, 0],
+      graphDataDepartamentos: [0 , 0, 0],
       totalUnidades: 0,
       totalDepartamentos: 0,
-      cidades: ["São Paulo", "Ribeirão Preto", "Piracicaba", "Bauru", "Lorena", "São Sebastião", "Santos"],
       unidades: [],
-      departamentos: [],
-      selectedCidade: "",
-      selectedUnidade: null,
-      selectedDepartamento: null,
-      aprovamTexto: [],
-      apoiamDiscussao: [],
-      nemAprovamApoiam: [],
+      tableHeadersUnidades: [
+        { text: "Campus", value: "Campus", filterable: true },
+        { text: "Sigla", value: "Sigla", filterable: true },
+        { text: "Unanimidade", value: "Unanimidade", filterable: true },
+        { text: "Aprovado", value: "Aprovado", filterable: true },
+        { text: "Apoio", value: "Apoio", filterable: true },
+        { text: "Favoráveis", value: "Favoráveis", filterable: true },
+        {text: "Contrários", value: "Contrários", filterable: true},
+        { text: "Abstenções", value: "Abstenções", filterable: true },
+      ],
+      tableHeadersDepartamentos: [
+        { text: "Campus", value: "Campus", filterable: true },
+        { text: "Sigla", value: "Sigla", filterable: true },
+        { text: "Nome", value: "Nome", filterable: true },
+        { text: "Unanimidade", value: "Unanimidade", filterable: true },
+        { text: "Aprovado", value: "Aprovado", filterable: true },
+        { text: "Apoio", value: "Apoio", filterable: true },
+        { text: "Favoráveis", value: "Favoráveis", filterable: true },
+        { text: "Contrários", value: "Contrários", filterable: true },
+        { text: "Abstenções", value: "Abstenções", filterable: true },
+      ],
+      Comentarios: 'Comentários',
+      tableRowsUnidades: [], // Colunas adicionais para departamentos
+      tableRowsDepartamentos: [],
     };
   },
   computed: {
-    graphData() {
-      return [this.aprovamTexto.length, this.apoiamDiscussao.length, this.nemAprovamApoiam.length];
+    hasData() {
+      return (dataset) => dataset && dataset.length > 0;
     },
   },
   watch: {
-    selectedTema() {
-      this.updateAllStats();
-      this.graphKeyCongregacao++;
-      this.graphKeyDepartamentos++;
+    selectedTema(newTema) {
+      if (newTema) {
+        this.loadDashboardData();
+      }
     },
   },
   methods: {
+    async fetchTemas() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "Temas"));
+        this.temas = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      } catch (error) {
+        console.error("Erro ao buscar temas:", error);
+      }
+    },
+    async loadDashboardData() {
+      try {
+        await this.fetchVotacoes();
+        this.calculateGraphData();
+        this.populateTables();
+        this.populateDepartamentosTable();
+      } catch (error) {
+        console.error("Erro ao carregar dados do dashboard:", error);
+      }
+    },
+    async fetchVotacoes() {
+      try {
+        const congregacaoSnapshot = await getDocs(
+          query(collection(db, "VotacoesCongregacao"), where("temaID", "==", this.selectedTema))
+        );
+        this.votacoesCongregacao = congregacaoSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const departamentosSnapshot = await getDocs(
+          query(collection(db, "VotacoesDepartamentos"), where("temaID", "==", this.selectedTema))
+        );
+        this.votacoesDepartamentos = departamentosSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const unidadesSnapshot = await getDocs(collection(db, "Unidades"));
+        this.unidades = unidadesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      } catch (error) {
+        console.error("Erro ao buscar votações ou unidades:", error);
+      }
+    },
     async fetchTotalUnidades() {
       try {
         const querySnapshot = await getDocs(collection(db, "Unidades"));
@@ -257,93 +247,98 @@ export default {
         console.error("Erro ao buscar total de unidades:", error);
       }
     },
-    async fetchTemas() {
-      try {
-        const querySnapshot = await getDocs(collection(db, "Temas"));
-        this.temas = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      } catch (error) {
-        console.error("Erro ao buscar temas:", error);
-      }
-    },
-    async fetchVotacoes() {
-      try {
-        const congregacaoSnapshot = await getDocs(collection(db, "VotacoesCongregacao"));
-        this.votacoesCongregacao = congregacaoSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    calculateGraphData() {
+      const aprovam = this.votacoesCongregacao.filter((votacao) => votacao.Aprovado === "Sim").length;
+      const apoiam = this.votacoesCongregacao.filter((votacao) => votacao.Apoio === "Sim" && votacao.Aprovado === "Não").length;
+      const naoAprovam = this.votacoesCongregacao.filter((votacao) => votacao.Apoio === "Não" && votacao.Aprovado === "Não").length;
 
-        const departamentosSnapshot = await getDocs(collection(db, "VotacoesDepartamentos"));
-        this.votacoesDepartamentos = departamentosSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      } catch (error) {
-        console.error("Erro ao buscar votações:", error);
-      }
+      // Atualiza os dados e força reatividade
+      this.graphDataCongregacao = [aprovam, apoiam, naoAprovam];
+      this.graphKeyCongregacao++; // Incrementa a chave
+
+      const deptAprovam = this.votacoesDepartamentos.filter((votacao) => votacao.Aprovado === "Sim").length;
+      const deptApoiam = this.votacoesDepartamentos.filter((votacao) => votacao.Apoio === "Sim" && votacao.Aprovado === "Não").length;
+      const deptNaoAprovam = this.votacoesDepartamentos.filter((votacao) => votacao.Apoio === "Não" && votacao.Aprovado === "Não").length;
+
+      this.graphDataDepartamentos = [deptAprovam, deptApoiam, deptNaoAprovam];
+      this.graphKeyDepartamentos++; // Incrementa a chave
+
+      console.log("Dados convertidos para gráfico de congregação:", this.graphDataCongregacao);
+      console.log("Dados convertidos para gráfico de departamentos:", this.graphDataDepartamentos);
     },
-    async fetchUnidades() {
-      if (!this.selectedCidade) {
-        this.unidades = [];
-        this.departamentos = [];
-        return;
-      }
+    populateTables() {
+      this.tableRowsUnidades = this.votacoesCongregacao.map((votacao) => {
+        const unidade = this.unidades.find((u) => u.id === votacao.unidadeID);
+        return {
+          Campus: unidade ? unidade.Campus : "N/A",
+          Sigla: unidade ? unidade.Sigla : "N/A",
+          Unanimidade: votacao.Unanimidade || "N/A",
+          Aprovado: votacao.Aprovado || "N/A",
+          Apoio: votacao.Apoio || "N/A",
+          Favoráveis: votacao.Placar?.Favoraveis || 0,
+          Contrários: votacao.Placar?.Contrarios || 0,
+          Abstenções: votacao.Placar?.Abstencoes || 0,
+          Comentários: votacao.Comentarios || ""
+        };
+      });
+    },
+    populateDepartamentosTable() {
+      // Realiza o merge entre as tabelas
+      this.tableRowsDepartamentos = this.votacoesDepartamentos.map((votacao) => {
+        const departamento = this.departamentos.find((d) => d.id === votacao.dptID);
+        const unidade = this.unidades.find((u) => u.id === departamento?.UnidadeID);
+        console.log(this.departamentos.id)
+        return {
+          Campus: unidade ? unidade.Campus : "N/A",
+          Nome: departamento ? departamento.Nome : "N/A",
+          Sigla: unidade ? unidade.Sigla : "N/A",
+          Unanimidade: votacao.Unanimidade || "N/A",
+          Aprovado: votacao.Aprovado || "N/A",
+          Apoio: votacao.Apoio || "N/A",
+          Favoráveis: votacao.Placar?.Favoraveis || 0,
+          Contrários: votacao.Placar?.Contrarios || 0,
+          Abstenções: votacao.Placar?.Abstencoes || 0,
+          Comentários: votacao.Comentarios || "",
+        };
+      });
+    },
+    async fetchDepartamentosData() {
       try {
-        const unidadesQuery = query(collection(db, "Unidades"), where("Campus", "==", this.selectedCidade));
-        const querySnapshot = await getDocs(unidadesQuery);
-        this.unidades = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        this.selectedUnidade = null;
-        this.departamentos = [];
+        const departamentosSnapshot = await getDocs(collection(db, "Departamentos"));
+        this.departamentos = departamentosSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const unidadesSnapshot = await getDocs(collection(db, "Unidades"));
+        this.unidades = unidadesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const votacoesSnapshot = await getDocs(collection(db, "VotacoesDepartamentos"));
+        this.votacoesDepartamentos = votacoesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Preenche a tabela
+        this.populateDepartamentosTable();
       } catch (error) {
-        console.error("Erro ao buscar unidades:", error);
+        console.error("Erro ao buscar dados dos departamentos:", error);
       }
-    },
-    async fetchDepartamentos() {
-      if (!this.selectedUnidade) {
-        this.departamentos = [];
-        this.selectedDepartamento = null;
-        return;
-      }
-      try {
-        const departamentosQuery = query(collection(db, "Departamentos"), where("UnidadeID", "==", this.selectedUnidade.id));
-        const querySnapshot = await getDocs(departamentosQuery);
-        this.departamentos = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        this.selectedDepartamento = null;
-      } catch (error) {
-        console.error("Erro ao buscar departamentos:", error);
-      }
-    },
-    calculateStats(base) {
-      if (!this.selectedTema || !base.length) return [0, 0, 0];
-      const aprovam = base.filter((votacao) => votacao.temaID === this.selectedTema && votacao.Aprovado === "Sim").length;
-      const apoiam = base.filter((votacao) => votacao.temaID === this.selectedTema && votacao.Aprovado === "Não" && votacao.Apoio === "Sim").length;
-      const naoAprovam = base.filter((votacao) => votacao.temaID === this.selectedTema && votacao.Aprovado === "Não" && votacao.Apoio === "Não").length;
-      return [aprovam, apoiam, naoAprovam];
-    },
-    updateAllStats() {
-      this.graphDataCongregacao = this.calculateStats(this.votacoesCongregacao);
-      this.graphDataDepartamentos = this.calculateStats(this.votacoesDepartamentos);
-      this.aprovamTexto = this.graphDataCongregacao[0];
-      this.apoiamDiscussao = this.graphDataCongregacao[1];
-      this.nemAprovamApoiam = this.graphDataCongregacao[2];
-    },
-    formatUnitDisplay(unit) {
-      if (unit.Placar && unit.Placar.Favoraveis !== null) {
-        return `${unit.unidadeID} - ${unit.Placar.Favoraveis} a favor, ${unit.Placar.Contrarios} contra, ${unit.Placar.Abstencoes} abstenções - ${unit.DataVotacao}`;
-      } else if (unit.Unanimidade === "Sim") {
-        return `${unit.unidadeID} (Unanimidade) - ${unit.DataVotacao}`;
-      } else {
-        return `${unit.unidadeID} - ${unit.DataVotacao}`;
-      }
-    },
-    setActiveTabUnidades(tab) {
-      this.activeTabUnidades = tab;
     },
   },
   async mounted() {
+    
+    await this.fetchTemas();
     await this.fetchTotalUnidades();
     await this.fetchTotalDepartamentos();
-    await this.fetchTemas();
+    await this.fetchDepartamentosData();
     await this.fetchVotacoes();
-    this.updateAllStats();
   },
 };
 </script>
-
 
 <style scoped>
 .tab-content {

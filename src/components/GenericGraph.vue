@@ -18,14 +18,23 @@
       labels: {
         type: Array,
         required: true,
+        validator(value) {
+          return value.every((label) => typeof label === "string");
+        },
       },
       data: {
         type: Array,
         required: true,
+        validator(value) {
+          return value.every((num) => typeof num === "number" && num >= 0);
+        },
       },
       colors: {
         type: Array,
         required: true,
+        validator(value) {
+          return value.every((color) => typeof color === "string");
+        },
       },
       width: {
         type: String,

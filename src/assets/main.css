@@ -48,7 +48,8 @@ main {
   flex: 1; /* Garante que o conteúdo principal ocupe o máximo de espaço disponível */
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centraliza verticalmente o conteúdo principal */
+  padding-top: 2%;
+  /*justify-content: center;  Centraliza verticalmente o conteúdo principal */
 }
 
 header {
