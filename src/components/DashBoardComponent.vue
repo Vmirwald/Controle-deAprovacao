@@ -37,10 +37,10 @@
                     
                     <div class="col-md-2 mb-3">
                       <div class="row">
-                        {{ graphData[0] }}
+                        {{ graphDataCongregacao[0] }}
                       </div>
                       <div class="row">
-                        {{ graphData[1] }}
+                        {{ graphDataCongregacao[1] }}
                       </div>
                       <div class="row">
                         {{ totalUnidades }}
@@ -49,10 +49,10 @@
                     <div class="col-md-4 mb-3">
                       
                       <GenericGraph
-                        :key="graphKey"
+                        :key="graphKeyCongregacao"
                         :title="'Distribuição de Apoio nas Unidades'"
                         :labels="['Aprovaram Texto', 'Apoiam Discussão', 'Não Aprovam ou Apoiam']"
-                        :data="graphData"
+                        :data="graphDataCongregacao"
                         :colors="['#4caf50', '#2196f3', '#FF0000']"
                         :selectedLabel="activeTabUnidades"
                         @section-clicked="setActiveTabUnidades"
@@ -61,22 +61,22 @@
 
                     <div class="col-md-2 mb-3">
                       <div class="row">
-                        
+                        {{ graphDataDepartamentos[0] }}
                       </div>
                       <div class="row">
-                        
+                        {{ graphDataDepartamentos[1] }}
                       </div>
                       <div class="row">
-                        
-                      </div>                      
+                        {{ totalDepartamentos }}
+                      </div>                     
                     </div>
                     <div class="col-md-4 mb-3">
                       
                       <GenericGraph
-                        :key="graphKey"
+                        :key="graphKeyDepartamentos"
                         :title="'Distribuição de Apoio nas Unidades'"
                         :labels="['Aprovaram Texto', 'Apoiam Discussão', 'Não Aprovam ou Apoiam']"
-                        :data="graphData"
+                        :data="graphDataDepartamentos"
                         :colors="['#4caf50', '#2196f3', '#FF0000']"
                         :selectedLabel="activeTabUnidades"
                         @section-clicked="setActiveTabUnidades"
@@ -202,35 +202,30 @@ export default {
   data() {
     return {
       graphKey: 0,
-      
+      graphKeyCongregacao: 1,
+      graphKeyDepartamentos: 2,
       activeTabUnidades: "Aprovaram Texto",
       navbarItems: [
-        {
-          id: "Aprovaram Texto",
-          label: "Aprovaram Texto",
-          icon: "fas fa-check-circle",
-          disabled: false,
-        },
-        {
-          id: "Apoiam Discussão",
-          label: "Apoiam Discussão",
-          icon: "fas fa-comments",
-          disabled: false,
-        },
+        { id: "Aprovaram Texto", label: "Aprovaram Texto", icon: "fas fa-check-circle", disabled: false },
+        { id: "Apoiam Discussão", label: "Apoiam Discussão", icon: "fas fa-comments", disabled: false },
       ],
       temas: [],
       selectedTema: "",
       votacoesCongregacao: [],
-      aprovamTexto: [],
-      apoiamDiscussao: [],
-      nemAprovamApoiam: [],
+      votacoesDepartamentos: [],
+      graphDataCongregacao: [0, 0, 0],
+      graphDataDepartamentos: [0, 0, 0],
+      totalUnidades: 0,
+      totalDepartamentos: 0,
       cidades: ["São Paulo", "Ribeirão Preto", "Piracicaba", "Bauru", "Lorena", "São Sebastião", "Santos"],
       unidades: [],
-      totalUnidades: 0,
       departamentos: [],
       selectedCidade: "",
       selectedUnidade: null,
       selectedDepartamento: null,
+      aprovamTexto: [],
+      apoiamDiscussao: [],
+      nemAprovamApoiam: [],
     };
   },
   computed: {
@@ -240,15 +235,24 @@ export default {
   },
   watch: {
     selectedTema() {
-      this.updateTemaFilter();
-      this.graphKey++; // Incrementa a chave para recriar o gráfico
+      this.updateAllStats();
+      this.graphKeyCongregacao++;
+      this.graphKeyDepartamentos++;
     },
   },
   methods: {
     async fetchTotalUnidades() {
       try {
         const querySnapshot = await getDocs(collection(db, "Unidades"));
-        this.totalUnidades = querySnapshot.size; // querySnapshot.size contém o número total de documentos
+        this.totalUnidades = querySnapshot.size;
+      } catch (error) {
+        console.error("Erro ao buscar total de unidades:", error);
+      }
+    },
+    async fetchTotalDepartamentos() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "Departamentos"));
+        this.totalDepartamentos = querySnapshot.size;
       } catch (error) {
         console.error("Erro ao buscar total de unidades:", error);
       }
@@ -256,23 +260,20 @@ export default {
     async fetchTemas() {
       try {
         const querySnapshot = await getDocs(collection(db, "Temas"));
-        this.temas = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        this.temas = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       } catch (error) {
         console.error("Erro ao buscar temas:", error);
       }
     },
     async fetchVotacoes() {
       try {
-        const querySnapshot = await getDocs(collection(db, "VotacoesCongregacao"));
-        this.votacoesCongregacao = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const congregacaoSnapshot = await getDocs(collection(db, "VotacoesCongregacao"));
+        this.votacoesCongregacao = congregacaoSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+        const departamentosSnapshot = await getDocs(collection(db, "VotacoesDepartamentos"));
+        this.votacoesDepartamentos = departamentosSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       } catch (error) {
-        console.error("Erro ao buscar votações de congregação:", error);
+        console.error("Erro ao buscar votações:", error);
       }
     },
     async fetchUnidades() {
@@ -282,15 +283,9 @@ export default {
         return;
       }
       try {
-        const unidadesQuery = query(
-          collection(db, "Unidades"),
-          where("Campus", "==", this.selectedCidade)
-        );
+        const unidadesQuery = query(collection(db, "Unidades"), where("Campus", "==", this.selectedCidade));
         const querySnapshot = await getDocs(unidadesQuery);
-        this.unidades = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        this.unidades = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         this.selectedUnidade = null;
         this.departamentos = [];
       } catch (error) {
@@ -304,45 +299,27 @@ export default {
         return;
       }
       try {
-        const departamentosQuery = query(
-          collection(db, "Departamentos"),
-          where("UnidadeID", "==", this.selectedUnidade.id)
-        );
+        const departamentosQuery = query(collection(db, "Departamentos"), where("UnidadeID", "==", this.selectedUnidade.id));
         const querySnapshot = await getDocs(departamentosQuery);
-        this.departamentos = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        this.departamentos = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         this.selectedDepartamento = null;
       } catch (error) {
         console.error("Erro ao buscar departamentos:", error);
       }
     },
-    updateTemaFilter() {
-      if (!this.selectedTema) {
-        this.aprovamTexto = [];
-        this.apoiamDiscussao = [];
-        return;
-      }
-
-      // Filtra as votações com base no tema selecionado
-      this.aprovamTexto = this.votacoesCongregacao.filter(
-        (votacao) => votacao.temaID === this.selectedTema && votacao.Aprovado === "Sim"
-      );
-
-      this.apoiamDiscussao = this.votacoesCongregacao.filter(
-        (votacao) =>
-          votacao.temaID === this.selectedTema &&
-          votacao.Aprovado === "Não" &&
-          votacao.Apoio === "Sim"
-      );
-
-      this.nemAprovamApoiam = this.votacoesCongregacao.filter(
-        (votacao) =>
-          votacao.temaID === this.selectedTema &&
-          votacao.Aprovado === "Não" &&
-          votacao.Apoio === "Não"
-      );
+    calculateStats(base) {
+      if (!this.selectedTema || !base.length) return [0, 0, 0];
+      const aprovam = base.filter((votacao) => votacao.temaID === this.selectedTema && votacao.Aprovado === "Sim").length;
+      const apoiam = base.filter((votacao) => votacao.temaID === this.selectedTema && votacao.Aprovado === "Não" && votacao.Apoio === "Sim").length;
+      const naoAprovam = base.filter((votacao) => votacao.temaID === this.selectedTema && votacao.Aprovado === "Não" && votacao.Apoio === "Não").length;
+      return [aprovam, apoiam, naoAprovam];
+    },
+    updateAllStats() {
+      this.graphDataCongregacao = this.calculateStats(this.votacoesCongregacao);
+      this.graphDataDepartamentos = this.calculateStats(this.votacoesDepartamentos);
+      this.aprovamTexto = this.graphDataCongregacao[0];
+      this.apoiamDiscussao = this.graphDataCongregacao[1];
+      this.nemAprovamApoiam = this.graphDataCongregacao[2];
     },
     formatUnitDisplay(unit) {
       if (unit.Placar && unit.Placar.Favoraveis !== null) {
@@ -357,10 +334,12 @@ export default {
       this.activeTabUnidades = tab;
     },
   },
-  mounted() {
-    this.fetchTotalUnidades(); // Chame o método para buscar o total de unidades
-    this.fetchTemas();
-    this.fetchVotacoes();
+  async mounted() {
+    await this.fetchTotalUnidades();
+    await this.fetchTotalDepartamentos();
+    await this.fetchTemas();
+    await this.fetchVotacoes();
+    this.updateAllStats();
   },
 };
 </script>
