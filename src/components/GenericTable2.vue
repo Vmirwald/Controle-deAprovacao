@@ -1,5 +1,8 @@
 <template>
-  <div class="table-responsive">
+  <div
+    class="table-responsive"
+    :style="{ maxHeight: enableScroll ? '400px' : 'none', overflowY: enableScroll ? 'auto' : 'visible' }"
+  >
     <table class="table table-striped table-hover">
       <thead>
         <tr>
@@ -26,7 +29,11 @@
 
       <tbody>
         <!-- Linhas de dados -->
-        <tr v-for="(row, index) in filteredRows" :key="index" @click="$emit('rowClick', row)">
+        <tr
+          v-for="(row, index) in limitedRows"
+          :key="index"
+          @click="$emit('rowClick', row)"
+        >
           <td v-for="(value, key) in row" :key="key" :class="getColumnAlignment(key)">
             <!-- Verifica se é a chave da descrição -->
             <span v-if="key === descriptionKey && value">
@@ -38,7 +45,7 @@
           </td>
         </tr>
         <!-- Exibe uma mensagem se não houver dados -->
-        <tr v-if="filteredRows.length === 0">
+        <tr v-if="limitedRows.length === 0">
           <td :colspan="headers?.length || 1" class="text-center">Nenhum dado disponível</td>
         </tr>
       </tbody>
@@ -57,6 +64,7 @@
     </div>
   </div>
 </template>
+
 <script>
 export default {
   props: {
@@ -72,6 +80,10 @@ export default {
       type: String,
       default: "comments",
     },
+    enableScroll: {
+      type: Boolean,
+      default: true, // Habilita ou desabilita a limitação de itens com scroll
+    },
   },
   data() {
     return {
@@ -80,6 +92,12 @@ export default {
       filters: {}, // Armazena os valores dos filtros
       filteredRows: [], // Dados filtrados
     };
+  },
+  computed: {
+    limitedRows() {
+      // Retorna no máximo 10 itens se o scroll estiver habilitado
+      return this.enableScroll ? this.filteredRows.slice(0, 10) : this.filteredRows;
+    },
   },
   watch: {
     rows: {
@@ -106,7 +124,17 @@ export default {
   },
 };
 </script>
+
 <style scoped>
+/* Fixar os headers da tabela */
+table thead th {
+  position: sticky;
+  top: 0; /* Fixa no topo ao dar scroll */
+  z-index: 2; /* Garante que os headers fiquem acima das células */
+  background-color: #f8f9fa; /* Fundo para os headers */
+  border-bottom: 2px solid #dee2e6; /* Linha inferior dos headers */
+}
+
 /* Info icon styles */
 .info-icon {
   color: #007bff;

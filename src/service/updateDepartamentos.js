@@ -41,8 +41,8 @@ function processDepartamentos(inputFile, outputFile) {
 }
 
 // Arquivos de entrada e saída
-const inputFile = './src/service/departamentos.json';
-const outputFile = './src/service/departamentos_new.json';
+const inputFile = './departamentos.json';
+const outputFile = './departamentos_new.json';
 
 // Chamar a função
 processDepartamentos(inputFile, outputFile);

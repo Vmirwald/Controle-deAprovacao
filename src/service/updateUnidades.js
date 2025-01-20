@@ -1,8 +1,8 @@
 import fs from 'fs';
 
 // Ler os arquivos JSON existentes
-const unidadesPath = './src/service/unidades.json';
-const departamentosPath = './src/service/departamentos.json';
+const unidadesPath = './unidades.json';
+const departamentosPath = './departamentos.json';
 
 const unidades = JSON.parse(fs.readFileSync(unidadesPath, 'utf-8'));
 const departamentos = JSON.parse(fs.readFileSync(departamentosPath, 'utf-8'));
@@ -21,6 +21,6 @@ departamentos.Departamentos.forEach(departamento => {
 });
 
 // Escrever o novo arquivo `unidades_populado.json`
-fs.writeFileSync('./src/service/unidades_new.json', JSON.stringify(unidades, null, 2));
+fs.writeFileSync('./unidades_new.json', JSON.stringify(unidades, null, 2));
 
-console.log('unidades.json atualizado com sucesso e salvo como unidades_populado.json');
+console.log('unidades.json atualizado com sucesso e salvo como unidades_new.json');

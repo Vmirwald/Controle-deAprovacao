@@ -32,7 +32,7 @@ if (!fileName || !collectionName) {
 
 // Ler o arquivo JSON
 try {
-  const fileData = fs.readFileSync(`./src/service/${fileName}`, 'utf-8');
+  const fileData = fs.readFileSync(`./${fileName}`, 'utf-8');
   const jsonData = JSON.parse(fileData);
 
   // Subir os dados para o Firestore

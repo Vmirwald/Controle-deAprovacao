@@ -1,7 +1,9 @@
 <template>
     <div class="card generic-card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">{{ title }}</h5>
+        <slot name="title">
+          <h5 class="mb-0">{{ title }}</h5>
+        </slot>
         <button
           v-if="showNewButton"
           class="btn btn-sm btn-primary"
@@ -27,7 +29,7 @@
     props: {
       title: {
         type: String,
-        required: true,
+        required: false,
       },
       showNewButton: {
         type: Boolean,

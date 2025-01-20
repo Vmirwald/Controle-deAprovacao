@@ -36,7 +36,7 @@ a,
   }
 
   #app {
-    padding: 1.5rem 2rem; /* Ajusta espaçamento interno em telas grandes */
+    padding: 1.rem 1.8rem; /* Ajusta espaçamento interno em telas grandes */
     flex: 1; /* Garante que o conteúdo principal ocupe o espaço disponível */
     display: flex;
     flex-direction: column;
@@ -48,7 +48,7 @@ main {
   flex: 1; /* Garante que o conteúdo principal ocupe o máximo de espaço disponível */
   display: flex;
   flex-direction: column;
-  padding-top: 2%;
+  justify-content: flex-start;
   /*justify-content: center;  Centraliza verticalmente o conteúdo principal */
 }
 
