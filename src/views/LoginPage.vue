@@ -73,10 +73,15 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%; /* Altura total da viewport */
+  width: 100%; /* Largura total da viewport */
   background: linear-gradient(to right, #6a11cb, #2575fc);
   font-family: 'Arial', sans-serif;
+  margin: 0; /* Remove margens */
+  padding: 0; /* Remove paddings */
+  overflow: hidden; /* Remove rolagem desnecessária */
 }
+
 
 /* Cartão de login */
 .login-card {

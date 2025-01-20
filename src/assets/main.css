@@ -1,14 +1,15 @@
 
 /* Garante que body e html ocupem 100% da altura */
 html, body {
-  height: 100%;
+  height: 100vh;
   margin: 0;
   padding: 0;
 }
 
 /* Permite que o #app ocupe todo o espaço disponível */
 #app {
-  height: 100%;
+  height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
 }
@@ -36,7 +37,7 @@ a,
   }
 
   #app {
-    padding: 1.rem 1.8rem; /* Ajusta espaçamento interno em telas grandes */
+    
     flex: 1; /* Garante que o conteúdo principal ocupe o espaço disponível */
     display: flex;
     flex-direction: column;
