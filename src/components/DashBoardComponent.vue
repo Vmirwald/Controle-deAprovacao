@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid layout-view py-0">
+  <div class="container-fluid layout-view py-1">
     <GenericCard :showNewButton="false">
       <template #title>
         <div class="title-container">
@@ -572,7 +572,6 @@ export default {
 };
 </script>
 <script setup>
-import { RouterLink, RouterView } from 'vue-router';
 import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
 import { ref, onMounted } from 'vue';
 
@@ -591,7 +590,7 @@ function handleLogout() {
   signOut(auth)
     .then(() => {
       alert('Você saiu com sucesso!');
-      window.location.href = '/login'; // Redireciona para a tela de login
+      window.location.href = '#/login'; // Redireciona para a tela de login
     })
     .catch((error) => {
       console.error('Erro ao sair:', error.message);

@@ -6,7 +6,7 @@
     <div 
       v-for="(row, index) in rows || []" 
       :key="index" 
-      class="row mb-2"
+      class="row "
     >
       <div 
         v-for="(col, colIndex) in row.columns || []" 

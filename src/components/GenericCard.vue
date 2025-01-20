@@ -40,8 +40,6 @@
   </script>
   
   <style scoped>
-  .generic-card {
-    margin-bottom: 1rem;
-  }
+  
   </style>
   
