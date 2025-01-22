@@ -85,13 +85,11 @@
 
                           </div>
                         </div>
-                        <div class="row">
-                          <GenericTable2
+                        <GenericTable2
                           :headers="tableHeadersUnidades"
                           :rows="tableRowsUnidades"
                           :description-key="'Comentários'"
-                          />
-                        </div>
+                        />
                       </div>
                     </div>
                   </template>
@@ -601,41 +599,13 @@ function handleLogout() {
 </script>
 
 <style scoped>
+
 .layout-view {
-  height: 100vh; /* Altura total da viewport menos um espaço reservado */
+  height: calc(100vh); /* Altura total da viewport menos um espaço reservado */
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Evita scroll na página */
+  overflow: auto; /* Evita scroll na página */
 }
-
-
-.col-md-6 {
-  flex: 1; /* Cada coluna ocupa metade da largura da linha */
-  max-height: 100%; /* Impede o crescimento excessivo em altura */
-  display: flex;
-  flex-direction: column;
-}
-
-.generic-card {
-  flex: 1; /* Faz o card ocupar todo o espaço disponível */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* Remove scroll interno */
-  
-}
-
-.card-header,
-.card-footer {
-  flex-shrink: 0; /* Impede que o header e footer encolham */
-  padding: 0.5rem;
-}
-
-.card-body {
-  height: 100%;
-  flex-grow: 1; /* Permite que o conteúdo cresça */
-  overflow-y: auto; /* Habilita scroll interno caso necessário */
-}
-
 .tab-content {
   margin-top: 1rem;
 }
