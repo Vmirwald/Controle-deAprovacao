@@ -8,6 +8,8 @@ import 'bootstrap';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 import './service/firebase';
+import "vue-select/dist/vue-select.css";
+
 
 const app = createApp(App)
 

@@ -602,7 +602,7 @@ function handleLogout() {
 
 <style scoped>
 .layout-view {
-  height: calc(100vh - 50px); /* Altura total da viewport menos um espaço reservado */
+  height: 100vh; /* Altura total da viewport menos um espaço reservado */
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Evita scroll na página */

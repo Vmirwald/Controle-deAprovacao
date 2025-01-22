@@ -96,7 +96,7 @@ export default {
   computed: {
     limitedRows() {
       // Retorna no máximo 10 itens se o scroll estiver habilitado
-      return this.enableScroll ? this.filteredRows.slice(0, 10) : this.filteredRows;
+      return this.enableScroll ? this.filteredRows.slice(0, 300) : this.filteredRows;
     },
   },
   watch: {
